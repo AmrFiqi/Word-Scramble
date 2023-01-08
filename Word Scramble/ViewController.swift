@@ -14,8 +14,10 @@ class ViewController: UITableViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
+        // create the add word button where the user will enter answers
         navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(promptForAnswer))
         
+        // load the words from the "start.txt" files
         if let startWordsURL = Bundle.main.url(forResource: "start", withExtension: ".txt"){
             if let startWords = try? String(contentsOf: startWordsURL){
                 allWords = startWords.components(separatedBy: "\n")
@@ -45,6 +47,7 @@ class ViewController: UITableViewController {
         return cell
     }
     
+    // Show an allert with text field that allows the user to enter a word
     @objc func promptForAnswer(){
         let ac = UIAlertController(title: "Enter Anser", message: nil, preferredStyle: .alert)
         ac.addTextField()
@@ -58,6 +61,8 @@ class ViewController: UITableViewController {
         present(ac, animated: true)
     }
     
+    
+    // Submit user answer after checking if it satisfies the conditions
     func submit(_ answer: String){
         let lowAnswer = answer.lowercased()
         
@@ -74,16 +79,32 @@ class ViewController: UITableViewController {
         
     }
     
+    // Check if the word the user entered is possible from the random word
     func isPossible(word: String) -> Bool{
+        guard var temp = title?.lowercased() else { return false}
+        
+        for letter in word {
+            if let position = temp.firstIndex(of: letter){
+                temp.remove(at: position)
+            }
+            else{ return false }
+        }
+        
         return true
     }
     
+    // Check if the word has never been entered before
     func isOriginal(word: String) -> Bool{
-        return true
+        return !usedWords.contains(word)
     }
     
+    // Check if the word is real
     func isReal(word: String) -> Bool {
-        return true
+        let checker = UITextChecker()
+        let range = NSRange(location: 0, length: word.utf16.count)
+        let rangeMisspelled = checker.rangeOfMisspelledWord(in: word, range: range, startingAt: 0, wrap: false, language: "en")
+        
+        return rangeMisspelled.location ==  NSNotFound
     }
     
 }
