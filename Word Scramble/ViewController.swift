@@ -26,11 +26,12 @@ class ViewController: UITableViewController {
         else{
             allWords = ["helloworld"]
         }
-        
         startGame()
+        navigationItem.leftBarButtonItem = UIBarButtonItem(title: "Start Over", style: .plain, target: self, action: #selector(startGame))
+        
     }
 
-    func startGame(){
+    @objc func startGame(){
         title = allWords.randomElement()
         usedWords.removeAll(keepingCapacity: true)
         tableView.reloadData()
@@ -65,9 +66,7 @@ class ViewController: UITableViewController {
     // Submit user answer after checking if it satisfies the conditions
     func submit(_ answer: String){
         let lowAnswer = answer.lowercased()
-        
-        let errorTitle: String
-        let errorMessage: String
+
         
         if isPossible(word: lowAnswer){
             if isOriginal(word: lowAnswer){
@@ -79,23 +78,17 @@ class ViewController: UITableViewController {
                     return
                 }
                 else{
-                    errorTitle = "Unrecognised Word"
-                    errorMessage = "Please Enter a real word!"
+                    showError("Unrecognised Word", "Please enter a real word!")
                 }
             }
             else{
-                errorTitle = "Already Used"
-                errorMessage = "You have already used this word!"
+                showError("Already used", "You have already used this word!")
             }
         }
         else{
-            errorTitle = "Word not possible"
-            errorMessage = "This word can't be created from \(title!.lowercased())."
+            showError("Word not Possible", "This word can't be created from \(title!.lowercased()).")
         }
-        let ac = UIAlertController(title: errorTitle, message: errorMessage, preferredStyle: .alert)
-        ac.addAction(UIAlertAction(title: "Try again", style: .default))
-        
-        present(ac, animated: true)
+
         
     }
     
@@ -115,6 +108,9 @@ class ViewController: UITableViewController {
     
     // Check if the word has never been entered before
     func isOriginal(word: String) -> Bool{
+        if word.utf16.count == title?.count{
+            return false
+        }
         return !usedWords.contains(word)
     }
     
@@ -124,7 +120,18 @@ class ViewController: UITableViewController {
         let range = NSRange(location: 0, length: word.utf16.count)
         let rangeMisspelled = checker.rangeOfMisspelledWord(in: word, range: range, startingAt: 0, wrap: false, language: "en")
         
+        if word.utf16.count < 3 {
+            return false
+        }
         return rangeMisspelled.location ==  NSNotFound
+    }
+    
+    //Show error messages for each case
+    func showError(_ errorTitle: String,_ errorMessage: String){
+        let ac = UIAlertController(title: errorTitle, message: errorMessage, preferredStyle: .alert)
+        ac.addAction(UIAlertAction(title: "Try again", style: .default))
+        
+        present(ac, animated: true)
     }
     
 }
