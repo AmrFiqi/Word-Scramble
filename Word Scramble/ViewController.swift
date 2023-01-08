@@ -66,16 +66,36 @@ class ViewController: UITableViewController {
     func submit(_ answer: String){
         let lowAnswer = answer.lowercased()
         
+        let errorTitle: String
+        let errorMessage: String
+        
         if isPossible(word: lowAnswer){
             if isOriginal(word: lowAnswer){
                 if isReal(word: lowAnswer){
                     usedWords.insert(lowAnswer, at: 0)
-                    
                     let indexPath = IndexPath(row: 0, section: 0)
                     tableView.insertRows(at: [indexPath], with: .automatic)
+                    
+                    return
+                }
+                else{
+                    errorTitle = "Unrecognised Word"
+                    errorMessage = "Please Enter a real word!"
                 }
             }
+            else{
+                errorTitle = "Already Used"
+                errorMessage = "You have already used this word!"
+            }
         }
+        else{
+            errorTitle = "Word not possible"
+            errorMessage = "This word can't be created from \(title!.lowercased())."
+        }
+        let ac = UIAlertController(title: errorTitle, message: errorMessage, preferredStyle: .alert)
+        ac.addAction(UIAlertAction(title: "Try again", style: .default))
+        
+        present(ac, animated: true)
         
     }
     
