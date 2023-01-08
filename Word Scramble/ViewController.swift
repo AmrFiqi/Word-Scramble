@@ -18,7 +18,7 @@ class ViewController: UITableViewController {
         
         if let startWordsURL = Bundle.main.url(forResource: "start", withExtension: ".txt"){
             if let startWords = try? String(contentsOf: startWordsURL){
-                allWords = startWords.components(separatedBy: "/n")
+                allWords = startWords.components(separatedBy: "\n")
             }
         }
         else{
@@ -58,9 +58,32 @@ class ViewController: UITableViewController {
         present(ac, animated: true)
     }
     
-    func submit(_ item: String){
+    func submit(_ answer: String){
+        let lowAnswer = answer.lowercased()
         
+        if isPossible(word: lowAnswer){
+            if isOriginal(word: lowAnswer){
+                if isReal(word: lowAnswer){
+                    usedWords.insert(lowAnswer, at: 0)
+                    
+                    let indexPath = IndexPath(row: 0, section: 0)
+                    tableView.insertRows(at: [indexPath], with: .automatic)
+                }
+            }
+        }
         
+    }
+    
+    func isPossible(word: String) -> Bool{
+        return true
+    }
+    
+    func isOriginal(word: String) -> Bool{
+        return true
+    }
+    
+    func isReal(word: String) -> Bool {
+        return true
     }
     
 }
